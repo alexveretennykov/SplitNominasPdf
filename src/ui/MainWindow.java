@@ -138,8 +138,18 @@ public class MainWindow extends javax.swing.JFrame {
                 try {
                     String month = " " + jComboBox1.getSelectedItem().toString();
                     String text = pdfManager.getName();
-                    //String text = pdfManager.toText();
-                    logTextArea.append(text + month + "\n");
+
+                    if (!text.equals("")) {
+                        logTextArea.append(text + month + ".pdf" + "\n");
+                    }else{
+                        logTextArea.append(
+                                "\n**********************************************"
+                                +"\nNo se ha encontrado el nombre del trabajador." 
+                                +"\nEs posible que no sea el PDF esperado o" 
+                                +"\nque haya cambiado el formato de las nóminas."
+                                +"\n**********************************************\n"
+                        );
+                    }
                 } catch (Exception ex) {
                     logTextArea.append(ex.getMessage() + "\n");
                 }
@@ -153,10 +163,10 @@ public class MainWindow extends javax.swing.JFrame {
     private void jComboBox1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBox1ItemStateChanged
         SimpleDateFormat dateM = new SimpleDateFormat("MM");
         int month = Integer.valueOf(dateM.format(new Date()));
-        
-        if(jComboBox1.getSelectedIndex() != (month-1)){
+
+        if (jComboBox1.getSelectedIndex() != (month - 1)) {
             jComboBox1.setBackground(Color.red);
-        }else{
+        } else {
             jComboBox1.setBackground(Color.gray);
         }
     }//GEN-LAST:event_jComboBox1ItemStateChanged
