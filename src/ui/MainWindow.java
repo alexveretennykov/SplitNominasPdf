@@ -6,10 +6,14 @@
 package ui;
 
 import app.PDFManager;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  *
@@ -22,6 +26,8 @@ public class MainWindow extends javax.swing.JFrame {
      */
     public MainWindow() {
         initComponents();
+
+        initComboBox();
     }
 
     /**
@@ -38,13 +44,15 @@ public class MainWindow extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         logTextArea = new javax.swing.JTextArea();
         btnOpenFile = new javax.swing.JButton();
+        jComboBox1 = new javax.swing.JComboBox<>();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMaximumSize(null);
         setMinimumSize(null);
         setName("MainFrame"); // NOI18N
         setResizable(false);
-        setSize(new java.awt.Dimension(400, 300));
+        setSize(new java.awt.Dimension(800, 800));
 
         logTextArea.setEditable(false);
         logTextArea.setColumns(1);
@@ -59,6 +67,18 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
 
+        jComboBox1.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jComboBox1ItemStateChanged(evt);
+            }
+        });
+
+        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabel1.setText("El mes de la nómina:");
+        jLabel1.setAlignmentY(0.0F);
+        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -66,9 +86,17 @@ public class MainWindow extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 286, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
-                .addComponent(btnOpenFile)
-                .addGap(27, 27, 27))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnOpenFile, javax.swing.GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
+                            .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -79,7 +107,11 @@ public class MainWindow extends javax.swing.JFrame {
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(40, 40, 40)
-                        .addComponent(btnOpenFile)))
+                        .addComponent(btnOpenFile)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -88,6 +120,7 @@ public class MainWindow extends javax.swing.JFrame {
 
     private void btnOpenFileMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnOpenFileMouseClicked
         JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setPreferredSize(new Dimension(600, 500));
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home") + "/Downloads"));
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
@@ -103,18 +136,30 @@ public class MainWindow extends javax.swing.JFrame {
                 PDFManager pdfManager = new PDFManager();
                 pdfManager.setFilePath(filePath.getAbsolutePath());
                 try {
+                    String month = " " + jComboBox1.getSelectedItem().toString();
                     String text = pdfManager.getName();
                     //String text = pdfManager.toText();
-                    logTextArea.append(text + "\n");
+                    logTextArea.append(text + month + "\n");
                 } catch (Exception ex) {
                     logTextArea.append(ex.getMessage() + "\n");
                 }
-                
+
             } else {
                 logTextArea.append("ERROR > Solo se admiten archivos PDF" + "\n");
             }
         }
     }//GEN-LAST:event_btnOpenFileMouseClicked
+
+    private void jComboBox1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBox1ItemStateChanged
+        SimpleDateFormat dateM = new SimpleDateFormat("MM");
+        int month = Integer.valueOf(dateM.format(new Date()));
+        
+        if(jComboBox1.getSelectedIndex() != (month-1)){
+            jComboBox1.setBackground(Color.red);
+        }else{
+            jComboBox1.setBackground(Color.gray);
+        }
+    }//GEN-LAST:event_jComboBox1ItemStateChanged
 
     /**
      * @param args the command line arguments
@@ -155,10 +200,34 @@ public class MainWindow extends javax.swing.JFrame {
 
     }
 
+    private void initComboBox() {
+        SimpleDateFormat dateY = new SimpleDateFormat("YY");
+        SimpleDateFormat dateM = new SimpleDateFormat("MM");
+        String year = dateY.format(new Date());
+        int month = Integer.valueOf(dateM.format(new Date()));
+
+        jComboBox1.addItem("ene" + year);
+        jComboBox1.addItem("feb" + year);
+        jComboBox1.addItem("mar" + year);
+        jComboBox1.addItem("abr" + year);
+        jComboBox1.addItem("may" + year);
+        jComboBox1.addItem("jun" + year);
+        jComboBox1.addItem("jul" + year);
+        jComboBox1.addItem("ago" + year);
+        jComboBox1.addItem("sep" + year);
+        jComboBox1.addItem("oct" + year);
+        jComboBox1.addItem("nov" + year);
+        jComboBox1.addItem("dic" + year);
+
+        jComboBox1.setSelectedIndex(month - 1);
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnOpenFile;
+    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JFileChooser jFileChooser2;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea logTextArea;
     // End of variables declaration//GEN-END:variables
