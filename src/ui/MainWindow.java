@@ -7,19 +7,26 @@ package ui;
 
 import app.PDFManager;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.io.File;
+import java.io.IOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import javax.swing.ImageIcon;
 
 /**
  *
  * @author Alex
  */
 public class MainWindow extends javax.swing.JFrame {
+
+    File selectedFilePath;
 
     /**
      * Creates new form MainWindow
@@ -28,6 +35,8 @@ public class MainWindow extends javax.swing.JFrame {
         initComponents();
 
         initComboBox();
+
+        selectedFilePath = null;
     }
 
     /**
@@ -46,9 +55,10 @@ public class MainWindow extends javax.swing.JFrame {
         btnOpenFile = new javax.swing.JButton();
         jComboBox1 = new javax.swing.JComboBox<>();
         jLabel1 = new javax.swing.JLabel();
+        btnOpenFile1 = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setMaximumSize(null);
         setMinimumSize(null);
         setName("MainFrame"); // NOI18N
         setResizable(false);
@@ -79,6 +89,21 @@ public class MainWindow extends javax.swing.JFrame {
         jLabel1.setAlignmentY(0.0F);
         jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
 
+        btnOpenFile1.setText("Procesar");
+        btnOpenFile1.setAlignmentY(0.0F);
+        btnOpenFile1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnProcessDocumentMouseClicked(evt);
+            }
+        });
+
+        jButton1.setText("Abrir Carpeta");
+        jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButtonAbrirCarpetaMouseClicked(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -87,32 +112,37 @@ public class MainWindow extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 286, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(btnOpenFile, javax.swing.GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
-                            .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())))
+                            .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnOpenFile1, javax.swing.GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
+                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(40, 40, 40)
-                        .addComponent(btnOpenFile)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(34, 34, 34)
+                .addComponent(btnOpenFile)
+                .addGap(14, 14, 14)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(34, 34, 34)
+                .addComponent(btnOpenFile1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton1)
+                .addGap(34, 34, 34))
         );
 
         pack();
@@ -129,34 +159,9 @@ public class MainWindow extends javax.swing.JFrame {
 
         int result = fileChooser.showOpenDialog(this);
 
+        // Guarda la Ruta del fichero seleccioando
         if (result == JFileChooser.APPROVE_OPTION) {
-            File filePath = fileChooser.getSelectedFile();
-
-            if ((filePath != null) && (filePath.getName().contains(".pdf"))) {
-                PDFManager pdfManager = new PDFManager();
-                pdfManager.setFilePath(filePath.getAbsolutePath());
-                try {
-                    String month = " " + jComboBox1.getSelectedItem().toString();
-                    String text = pdfManager.getName();
-
-                    if (!text.equals("")) {
-                        logTextArea.append(text + month + ".pdf" + "\n");
-                    }else{
-                        logTextArea.append(
-                                "\n**********************************************"
-                                +"\nNo se ha encontrado el nombre del trabajador." 
-                                +"\nEs posible que no sea el PDF esperado o" 
-                                +"\nque haya cambiado el formato de las nóminas."
-                                +"\n**********************************************\n"
-                        );
-                    }
-                } catch (Exception ex) {
-                    logTextArea.append(ex.getMessage() + "\n");
-                }
-
-            } else {
-                logTextArea.append("ERROR > Solo se admiten archivos PDF" + "\n");
-            }
+            selectedFilePath = fileChooser.getSelectedFile();
         }
     }//GEN-LAST:event_btnOpenFileMouseClicked
 
@@ -170,6 +175,45 @@ public class MainWindow extends javax.swing.JFrame {
             jComboBox1.setBackground(Color.gray);
         }
     }//GEN-LAST:event_jComboBox1ItemStateChanged
+
+    private void btnProcessDocumentMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnProcessDocumentMouseClicked
+        if (selectedFilePath != null) {
+            if (selectedFilePath.getName().contains(".pdf")) {
+                // Separa las paginas del documento PDF en nuevos PDFs
+                int num = splitPdfDocument(selectedFilePath);
+
+                if (num > 0) {
+                    logTextArea.append("\nPDF procesado con éxito. \nArchivos generados: " + num + "\n");
+                } else {
+                    logTextArea.append("\nError al procesar el PDF seleccionado.\n");
+                }
+            } else {
+                logTextArea.append("\n¡ERROR! Solo se admiten archivos PDF." + "\n");
+            }
+        } else {
+            logTextArea.append("\n¡ERROR! No hay ningún archivo seleccionado." + "\n");
+        }
+
+        selectedFilePath = null;
+    }//GEN-LAST:event_btnProcessDocumentMouseClicked
+
+    private void jButtonAbrirCarpetaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonAbrirCarpetaMouseClicked
+        String userName = System.getProperty("user.name");
+        String nameFolder = "C:\\Users\\" + userName + "\\Documents\\Nominas\\";
+        File directorio = new File(nameFolder);
+
+        // Si no existe el directorio, se crea
+        if (!directorio.exists()) {
+            directorio.mkdirs();
+        }
+
+        try {
+            Desktop.getDesktop().open(directorio);
+        } catch (IOException ex) {
+            logTextArea.append("\n¡ERROR! "+ ex.getMessage() + "\n");
+        }
+
+    }//GEN-LAST:event_jButtonAbrirCarpetaMouseClicked
 
     /**
      * @param args the command line arguments
@@ -204,12 +248,14 @@ public class MainWindow extends javax.swing.JFrame {
                 JFrame frame = new MainWindow();
                 frame.setLocationRelativeTo(null);
                 frame.setTitle("Separador de nóminas");
+                frame.setIconImage(new ImageIcon("src/img/invoice.png").getImage());
                 frame.setVisible(true);
             }
         });
-
     }
 
+    // Inicializa el ComboBox con los meses del año actual
+    // El item seleccionado por defecto es el mes actual
     private void initComboBox() {
         SimpleDateFormat dateY = new SimpleDateFormat("YY");
         SimpleDateFormat dateM = new SimpleDateFormat("MM");
@@ -232,8 +278,45 @@ public class MainWindow extends javax.swing.JFrame {
         jComboBox1.setSelectedIndex(month - 1);
     }
 
+    private int splitPdfDocument(File originalFilePath) {
+        int numPages = 0;
+        PDFManager pdfManager = new PDFManager();
+
+        // Se genera el Nombre de Carpeta a partir del mes y año actual
+        String userName = System.getProperty("user.name");
+        SimpleDateFormat year = new SimpleDateFormat("yyyy");
+        int index = jComboBox1.getSelectedIndex() + 1;
+        String monthNum = "";
+
+        if (index < 10) {
+            monthNum = "0" + index + " ";
+        } else {
+            monthNum = "" + index + " ";
+        }
+        // Genera una cadena que empiza por el numero del mes seguido por el nombre del mes
+        String month = monthNum + jComboBox1.getSelectedItem().toString().subSequence(0, 3).toString();
+
+        String nameFolder = "C:\\Users\\" + userName + "\\Documents\\Nominas\\" + year.format(new Date()) + "\\" + month;
+        File outputFilePath = new File(nameFolder);
+
+        // Genera la cadena con el mes y año
+        // Se usa al renombrar los arvhivos PDF separados
+        String monthSelected = " " + jComboBox1.getSelectedItem().toString();
+
+        try {
+            // Divide el PDF
+            numPages = pdfManager.splitPdfDocument(originalFilePath, outputFilePath, monthSelected);
+        } catch (Exception ex) {
+            logTextArea.append("\n¡ERROR! " + ex.getMessage() + "\n");
+        }
+
+        return numPages;
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnOpenFile;
+    private javax.swing.JButton btnOpenFile1;
+    private javax.swing.JButton jButton1;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JFileChooser jFileChooser2;
