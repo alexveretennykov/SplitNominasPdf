@@ -22,7 +22,7 @@ import javax.swing.ImageIcon;
 
 /**
  *
- * @author Alex
+ * @author Oleksandr Veretennykov
  */
 public class MainWindow extends javax.swing.JFrame {
 
